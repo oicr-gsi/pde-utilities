@@ -4,9 +4,12 @@ package ca.on.oicr.pipedev.common.utilities;
  * @author Raunaq Suri
  *
  */
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -14,6 +17,31 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 public class WorkflowSpoofing {
+    
+    public void run(String xmlPath) throws DocumentException, IOException{
+        List<String> scripts = parseWorkflowXML(xmlPath);
+        getOutputFiles(scripts);
+        
+    }
+    
+    public List<String> getOutputFiles(List<String> scripts) throws IOException{
+        
+        List<String> outputFiles = new ArrayList<String>();
+        
+        for (String scriptPath : scripts){
+            File scriptFile = new File(scriptPath);
+            
+            String contents = FileUtils.readFileToString(scriptFile);
+            for(String s : contents.split("--")){
+                if(s.matches("output-file.*")){
+                    outputFiles.add(s.substring(s.indexOf(" "), s.lastIndexOf(" ")));
+                    
+                }
+            }
+        }
+        System.out.println(outputFiles.toString());
+        return outputFiles;
+    }
 
     public List<String> parseWorkflowXML(String xmlPath) throws DocumentException {
         List<String> outputScripts = new ArrayList<String>();
@@ -36,9 +64,9 @@ public class WorkflowSpoofing {
             }
         }
         for (Element action : actionOut) {
-           outputScripts.add(getOutputFilePaths(action));
+           outputScripts.add(getOutputScriptFilePaths(action));
         }
-        return null;
+        return outputScripts;
     }
 
     private boolean isProvisionOut(Element action) {
@@ -54,7 +82,7 @@ public class WorkflowSpoofing {
 
     }
 
-    private String getOutputFilePaths(Element action) {
+    private String getOutputScriptFilePaths(Element action) {
         for(Iterator i = action.elementIterator("sge"); i.hasNext();){
             Element sge = (Element) i.next();
             for(Iterator j = sge.elementIterator("script"); j.hasNext();){
@@ -68,9 +96,9 @@ public class WorkflowSpoofing {
         return null;
     }
 
-    public static void main(String[] args) throws DocumentException {
+    public static void main(String[] args) throws DocumentException, IOException {
         WorkflowSpoofing ws = new WorkflowSpoofing();
-        ws.parseWorkflowXML("/home/rsuri/working/oozie-f04a4fd7-60fa-4871-8904-3b486642ec94/workflow.xml");
+        ws.run("/home/rsuri/working/oozie-f04a4fd7-60fa-4871-8904-3b486642ec94/workflow.xml");
     }
 
 }
