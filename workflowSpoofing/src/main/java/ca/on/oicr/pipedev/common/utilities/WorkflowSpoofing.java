@@ -39,7 +39,6 @@ public class WorkflowSpoofing {
                 }
             }
         }
-        System.out.println(outputFiles.toString());
         return outputFiles;
     }
 
@@ -88,7 +87,6 @@ public class WorkflowSpoofing {
             for(Iterator j = sge.elementIterator("script"); j.hasNext();){
                 Element scriptPath = (Element) j.next();
                 String path = scriptPath.getData().toString();
-                System.out.println(path);
                 return path;
             }
             
