@@ -7,6 +7,7 @@ package ca.on.oicr.pipedev.common.utilities;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -17,6 +18,9 @@ public class WorkflowSpoofing
 {
     public List<String> parseWorkflowXML(String xmlPath) throws DocumentException{
         List<String> outputScripts = new ArrayList<String>();
+        
+        List<Element> actionOut = new ArrayList<Element>(); 
+        
         SAXReader reader = new SAXReader();
         Document document = reader.read(xmlPath);
         
@@ -28,11 +32,25 @@ public class WorkflowSpoofing
             Element action = (Element) i.next();
             
             //Iterates through action to verify that the action is an out
-            
+            if(isProvisionOut(action)){
+                actionOut.add(action);
+            }
         }
         return null;
     }
     
+    private boolean isProvisionOut(Element action){
+        
+        for( Iterator i = action.attributeIterator(); i.hasNext();){
+           Attribute attribute =(Attribute) i.next();
+           
+           if(attribute.getValue().matches("provisionFile_out_.*")){
+               return true;
+           }
+        }
+        return false;
+        
+    } 
     
     public static void main( String[] args ) throws DocumentException
     {
