@@ -1,10 +1,10 @@
-package net.sourceforge.seqware.pipeline.plugins.workflowspoofing;
+package ca.on.oicr.pipedev.common.utilities;
 
 /**
  * Hello world!
  *
  */
-public class App 
+public class WorkflowSpoofing 
 {
     public static void main( String[] args )
     {
