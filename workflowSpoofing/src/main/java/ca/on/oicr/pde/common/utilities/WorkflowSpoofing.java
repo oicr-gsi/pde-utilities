@@ -15,13 +15,35 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import ca.on.oicr.pde.deciders.BamQCDecider;
+import java.io.FilenameFilter;
+import java.util.Arrays;
 
 public class WorkflowSpoofing {
     
     public void run(String xmlPath) throws DocumentException, IOException{
         List<String> scripts = parseWorkflowXML(xmlPath);
         getOutputFiles(scripts);
+        List<File> iniFiles = new ArrayList<File>();
         
+        //Testing the parsing of the ini files
+        File iniRoot = new File("/tmp");
+        
+        FilenameFilter filefilter = new FilenameFilter() {
+
+            public boolean accept(File dir, String name) {
+                if(name.matches(".*.ini")){
+                    return true;
+                }
+                return false;
+            }
+        };
+        iniFiles.addAll(Arrays.asList(iniRoot.listFiles(filefilter)));
+        
+        for(File f : iniFiles){
+            parseIniFile(f.getCanonicalPath());
+            System.out.println(f.getCanonicalPath());
+        }
     }
     
     public List<String> getOutputFiles(List<String> scripts) throws IOException{
@@ -35,11 +57,25 @@ public class WorkflowSpoofing {
             for(String s : contents.split("--")){
                 if(s.matches("output-file.*")){
                     outputFiles.add(s.substring(s.indexOf(" "), s.lastIndexOf(" ")));
-                    
+                    System.out.println(s.substring(s.indexOf(" "), s.lastIndexOf(" ")));
                 }
             }
         }
         return outputFiles;
+    }
+    
+    public String parseIniFile(String iniFilePath) throws IOException{
+        File iniFile = new File(iniFilePath);
+        String iniToString = FileUtils.readFileToString(iniFile);
+        //Splits the file by newlines
+        
+        for(String s : iniToString.split("\n")){
+            if(s.matches("^parent[-_]accession[s]*.*$")){
+                System.out.println(s.substring(s.indexOf("=")+1));
+                return s.substring(s.indexOf("=")+1);
+            }
+        }
+        return null;
     }
 
     public List<String> parseWorkflowXML(String xmlPath) throws DocumentException {
@@ -96,7 +132,7 @@ public class WorkflowSpoofing {
 
     public static void main(String[] args) throws DocumentException, IOException {
         WorkflowSpoofing ws = new WorkflowSpoofing();
-        ws.run("/home/rsuri/working/oozie-f04a4fd7-60fa-4871-8904-3b486642ec94/workflow.xml");
+        ws.run("/.mounts/labs/PDE/public/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml");
     }
 
 }
