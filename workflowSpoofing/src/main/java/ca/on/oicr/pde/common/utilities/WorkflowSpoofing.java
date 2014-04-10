@@ -73,7 +73,7 @@ public class WorkflowSpoofing {
         for (Iterator i = action.attributeIterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
 
-            if (attribute.getValue().matches("provisionFile_out_.*")) {
+            if (attribute.getValue().matches("provisionFile_[oO]ut_.*")) {
                 return true;
             }
         }
