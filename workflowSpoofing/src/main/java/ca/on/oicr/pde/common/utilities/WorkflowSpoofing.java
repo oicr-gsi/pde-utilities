@@ -62,14 +62,20 @@ public class WorkflowSpoofing {
             String contents = FileUtils.readFileToString(scriptFile);
             for (String individualCommand : splitIntoCommands(contents)) {
                 for (String parameter : splitIntoParameters(individualCommand)) {
-                    if(parameter.matches("output-file .*")){
-                       outputFile = getOutputFile(parameter);
+                    if (parameter.matches("output-file .*")) {
+                        outputFile = getOutputFile(parameter);
+                    } else if (parameter.matches("input-file-metadata .*")) {
+                        mimeType = getMimeType(parameter);
                     }
-                    
+
                 }
             }
 
         }
+    }
+
+    private String getMimeType(String parameter) {
+        return parameter.substring(parameter.indexOf("::"), parameter.lastIndexOf("::"));
     }
 
     private String getOutputFile(String parameter) {
