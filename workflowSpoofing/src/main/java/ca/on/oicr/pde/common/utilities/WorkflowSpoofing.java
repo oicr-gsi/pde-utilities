@@ -66,12 +66,18 @@ public class WorkflowSpoofing {
                         outputFile = getOutputFile(parameter);
                     } else if (parameter.matches("input-file-metadata .*")) {
                         mimeType = getMimeType(parameter);
+                    } else if (parameter.matches("metdata-parent-accession .*")) {
+                        parentAccessions.add(getParentAccession(parameter));
                     }
 
                 }
             }
 
         }
+    }
+
+    private String getParentAccession(String parameter) {
+        return parameter.substring(parameter.indexOf(" "), parameter.lastIndexOf(" "));
     }
 
     private String getMimeType(String parameter) {
