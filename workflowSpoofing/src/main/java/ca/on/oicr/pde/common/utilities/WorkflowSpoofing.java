@@ -20,59 +20,79 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 
 public class WorkflowSpoofing {
-    
-    public void run(String xmlPath) throws DocumentException, IOException{
+
+    public void run(String xmlPath) throws DocumentException, IOException {
+        //Create the file linker file
+        File fileLinkerFile = new File("fileLinkerFile");
+        //Writes the file's header
+        FileUtils.writeStringToFile(fileLinkerFile, "sequencer_run,sample,lane,ius_sw_accession,file_status,mime_type,file\n");
+        fileLinkerFile.deleteOnExit();
+
         List<String> scripts = parseWorkflowXML(xmlPath);
-        getOutputFiles(scripts);
+        parseProvisionScripts(scripts);
         List<File> iniFiles = new ArrayList<File>();
-        
+
         //Testing the parsing of the ini files
         File iniRoot = new File("/tmp");
-        
+
         FilenameFilter filefilter = new FilenameFilter() {
 
             public boolean accept(File dir, String name) {
-                if(name.matches(".*.ini")){
+                if (name.matches(".*.ini")) {
                     return true;
                 }
                 return false;
             }
         };
         iniFiles.addAll(Arrays.asList(iniRoot.listFiles(filefilter)));
-        
-        for(File f : iniFiles){
+
+        for (File f : iniFiles) {
             parseIniFile(f.getCanonicalPath());
             System.out.println(f.getCanonicalPath());
         }
     }
-    
-    public List<String> getOutputFiles(List<String> scripts) throws IOException{
-        
-        List<String> outputFiles = new ArrayList<String>();
-        
-        for (String scriptPath : scripts){
+
+    public void parseProvisionScripts(List<String> scripts) throws IOException {
+        String outputFile = ".";
+        String mimeType = ".";
+        List<String> parentAccessions = new ArrayList<String>();
+
+        for (String scriptPath : scripts) {
             File scriptFile = new File(scriptPath);
-            
             String contents = FileUtils.readFileToString(scriptFile);
-            for(String s : contents.split("--")){
-                if(s.matches("output-file.*")){
-                    outputFiles.add(s.substring(s.indexOf(" "), s.lastIndexOf(" ")));
-                    System.out.println(s.substring(s.indexOf(" "), s.lastIndexOf(" ")));
+            for (String individualCommand : splitIntoCommands(contents)) {
+                for (String parameter : splitIntoParameters(individualCommand)) {
+                    if(parameter.matches("output-file .*")){
+                       outputFile = getOutputFile(parameter);
+                    }
+                    
                 }
             }
+
         }
-        return outputFiles;
     }
-    
-    public String parseIniFile(String iniFilePath) throws IOException{
+
+    private String getOutputFile(String parameter) {
+        return parameter.substring(parameter.indexOf(" "), parameter.lastIndexOf(" "));
+    }
+
+    private String[] splitIntoCommands(String contents) {
+        return contents.split("\n");
+    }
+
+    private String[] splitIntoParameters(String contents) {
+        return contents.split("--");
+    }
+
+    public String parseIniFile(String iniFilePath) throws IOException {
         File iniFile = new File(iniFilePath);
         String iniToString = FileUtils.readFileToString(iniFile);
         //Splits the file by newlines
-        
-        for(String s : iniToString.split("\n")){
-            if(s.matches("^parent[-_]accession[s]*.*$")){
-                System.out.println(s.substring(s.indexOf("=")+1));
-                return s.substring(s.indexOf("=")+1);
+
+        for (String s : iniToString.split("\n")) {
+            if (s.matches("^parent[-_]accession[s]*.*$")) {
+                System.out.println(s.substring(s.indexOf("=") + 1));
+                return s.substring(s.indexOf("=") + 1);
             }
         }
         return null;
@@ -99,7 +119,7 @@ public class WorkflowSpoofing {
             }
         }
         for (Element action : actionOut) {
-           outputScripts.add(getOutputScriptFilePaths(action));
+            outputScripts.add(getOutputScriptFilePaths(action));
         }
         return outputScripts;
     }
@@ -118,21 +138,23 @@ public class WorkflowSpoofing {
     }
 
     private String getOutputScriptFilePaths(Element action) {
-        for(Iterator i = action.elementIterator("sge"); i.hasNext();){
+        for (Iterator i = action.elementIterator("sge"); i.hasNext();) {
             Element sge = (Element) i.next();
-            for(Iterator j = sge.elementIterator("script"); j.hasNext();){
+            for (Iterator j = sge.elementIterator("script"); j.hasNext();) {
                 Element scriptPath = (Element) j.next();
                 String path = scriptPath.getData().toString();
                 return path;
             }
-            
+
         }
         return null;
     }
 
     public static void main(String[] args) throws DocumentException, IOException {
         WorkflowSpoofing ws = new WorkflowSpoofing();
-        ws.run("/.mounts/labs/PDE/public/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml");
+        String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
+        BamQCDecider.main(bamParams);
+//        ws.run("/.mounts/labs/PDE/public/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml");
     }
 
 }
