@@ -39,7 +39,7 @@ public class WorkflowSpoofing {
 
     public void run(String xmlPath) throws Exception {
         //parses the ini to get all the parent accessions the workflow accesses
-//        parseIniFile("/home/rsuri/workflow_cas_2.2_TS_withManualOutput.ini");
+        parseIniFile("/home/rsuri/workflow_cas_2.2_TS_withManualOutput.ini");
         
         //Create the file linker file
         File fileLinkerFile = new File("fileLinkerFile");
@@ -86,6 +86,20 @@ public class WorkflowSpoofing {
     private String[] getFileProvenanceReport() throws Exception {
         String userAuth = Base64.encodeBytes("admin@admin.com:admin".getBytes());
         String url = getWebserviceUrl();
+        String params = "?";
+        
+        Iterator<String> processingIter = parentAccessions.iterator();
+        
+        //First id
+        if(processingIter.hasNext()){
+            String id = processingIter.next();
+            params+="processing="+id;
+        }
+        //The rest
+        while(processingIter.hasNext()){
+            String id = processingIter.next();
+            params+="&processing="+id;
+        }
         
         //Removes the last slash of the webservice url if it exists
         if(url.endsWith("/")){
@@ -102,7 +116,7 @@ public class WorkflowSpoofing {
         connection2.connect();
         
         //Gets the file provenance report
-        URL reportUrl = new URL(url+"/reports/file-provenance");
+        URL reportUrl = new URL(url+"/reports/file-provenance"+params);
         
         HttpURLConnection connection = (HttpURLConnection) reportUrl.openConnection();
         connection.setRequestMethod("GET");
