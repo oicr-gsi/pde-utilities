@@ -18,20 +18,27 @@ import org.dom4j.io.SAXReader;
 import ca.on.oicr.pde.deciders.BamQCDecider;
 import java.io.FilenameFilter;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 public class WorkflowSpoofing {
 
     private final List<String> scripts = new ArrayList<String>();
-    private final Set<String> parentAccessions = (Set<String>) new ArrayList<String>();
+    private final Set<String> parentAccessions = new HashSet<String>();
+    private String mimeType;
+    private String outputFile;
 
     public void run(String xmlPath) throws Exception {
+        //parses the ini to get all the parent accessions the workflow accesses
+//        parseIniFile("/home/rsuri/workflow_cas_2.2_TS_withManualOutput.ini");
+        
         //Create the file linker file
         File fileLinkerFile = new File("fileLinkerFile");
         //Writes the file's header
         FileUtils.writeStringToFile(fileLinkerFile, "sequencer_run,sample,lane,ius_sw_accession,file_status,mime_type,file\n");
         //fileLinkerFile.deleteOnExit();
 
+        //Gets all the provision File out scripts
         scripts.addAll(parseWorkflowXML(xmlPath));
 
         for (String script : scripts) {
@@ -60,10 +67,8 @@ public class WorkflowSpoofing {
 //        }
     }
 
-    public String parseProvisionScript(String script) throws IOException {
+    private String parseProvisionScript(String script) throws IOException {
         String fileLinkerString = "";
-        String outputFile = ".";
-        String mimeType = ".";
 
         File scriptFile = new File(script);
 
