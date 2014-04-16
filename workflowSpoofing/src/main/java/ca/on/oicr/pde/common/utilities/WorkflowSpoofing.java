@@ -18,20 +18,21 @@ import org.dom4j.io.SAXReader;
 import ca.on.oicr.pde.deciders.BamQCDecider;
 import java.io.FilenameFilter;
 import java.util.Arrays;
+import java.util.Set;
 
 public class WorkflowSpoofing {
-    
+
     private final List<String> scripts = new ArrayList<String>();
+    private final Set<String> parentAccessions = (Set<String>) new ArrayList<String>();
+
     public void run(String xmlPath) throws Exception {
         //Create the file linker file
         File fileLinkerFile = new File("fileLinkerFile");
         //Writes the file's header
         FileUtils.writeStringToFile(fileLinkerFile, "sequencer_run,sample,lane,ius_sw_accession,file_status,mime_type,file\n");
         //fileLinkerFile.deleteOnExit();
-        
 
         scripts.addAll(parseWorkflowXML(xmlPath));
-        System.out.println(getWebserviceUrl());
 
         for (String script : scripts) {
             System.out.println(script);
@@ -39,7 +40,6 @@ public class WorkflowSpoofing {
         }
 
 //        List<File> iniFiles = new ArrayList<File>();
-
         //Testing the parsing of the ini files
 //        File iniRoot = new File("/tmp");
 //
@@ -64,10 +64,9 @@ public class WorkflowSpoofing {
         String fileLinkerString = "";
         String outputFile = ".";
         String mimeType = ".";
-        List<String> parentAccessions = new ArrayList<String>();
 
         File scriptFile = new File(script);
-        
+
         String contents = FileUtils.readFileToString(scriptFile);
         for (String individualCommand : splitIntoCommands(contents)) {
             for (String parameter : splitIntoParameters(individualCommand)) {
@@ -75,8 +74,6 @@ public class WorkflowSpoofing {
                     outputFile = getOutputFile(parameter);
                 } else if (parameter.matches("input-file-metadata .*")) {
                     mimeType = getMimeType(parameter);
-                } else if (parameter.matches("metadata-parent-accession .*")) {
-                    parentAccessions.add(getParentAccession(parameter));
                 }
 
             }
@@ -87,40 +84,39 @@ public class WorkflowSpoofing {
         }
         System.out.println(fileLinkerString);
         return fileLinkerString;
-
     }
-    
-    private String getWebserviceUrl() throws Exception{
+
+    private String getWebserviceUrl() throws Exception {
         String aScript = FileUtils.readFileToString(new File(scripts.get(0)));
-        String settingsPath="";
-        for(String scriptLines : aScript.split("\n")){
-            if(scriptLines.matches("export SEQWARE_SETTINGS=.*")){
-                settingsPath = scriptLines.substring(scriptLines.indexOf("=")+1);
+        String settingsPath = "";
+        for (String scriptLines : aScript.split("\n")) {
+            if (scriptLines.matches("export SEQWARE_SETTINGS=.*")) {
+                settingsPath = scriptLines.substring(scriptLines.indexOf("=") + 1);
             }
         }
-       if(settingsPath.isEmpty()){
-           throw new Exception("Settings file not found");
-       }
-       
-       String settings = FileUtils.readFileToString(new File(settingsPath));
-       for(String setting : settings.split("\n")){
-           if(setting.matches("SW_REST_URL=.*")){
-               return setting.substring(setting.indexOf("=")+1);
-           }
-       }
-       throw new Exception("Could not get webservice url");
+        if (settingsPath.isEmpty()) {
+            throw new Exception("Settings file not found");
+        }
+
+        String settings = FileUtils.readFileToString(new File(settingsPath));
+        for (String setting : settings.split("\n")) {
+            if (setting.matches("SW_REST_URL=.*")) {
+                return setting.substring(setting.indexOf("=") + 1);
+            }
+        }
+        throw new Exception("Could not get webservice url");
     }
 
     private String getParentAccession(String parameter) {
-        return parameter.substring(parameter.indexOf(" ")+1, parameter.lastIndexOf(" "));
+        return parameter.substring(parameter.indexOf(" ") + 1, parameter.lastIndexOf(" "));
     }
 
     private String getMimeType(String parameter) {
-        return parameter.substring(parameter.indexOf("::")+2, parameter.lastIndexOf("::"));
+        return parameter.substring(parameter.indexOf("::") + 2, parameter.lastIndexOf("::"));
     }
 
     private String getOutputFile(String parameter) {
-        return parameter.substring(parameter.indexOf(" ")+1, parameter.lastIndexOf(" "));
+        return parameter.substring(parameter.indexOf(" ") + 1, parameter.lastIndexOf(" "));
     }
 
     private String[] splitIntoCommands(String contents) {
@@ -131,18 +127,18 @@ public class WorkflowSpoofing {
         return contents.split("--");
     }
 
-    public String parseIniFile(String iniFilePath) throws IOException {
+    public void parseIniFile(String iniFilePath) throws IOException {
         File iniFile = new File(iniFilePath);
         String iniToString = FileUtils.readFileToString(iniFile);
         //Splits the file by newlines
-
+        String accessions = "";
         for (String s : iniToString.split("\n")) {
             if (s.matches("^parent[-_]accession[s]*.*$")) {
                 System.out.println(s.substring(s.indexOf("=") + 1));
-                return s.substring(s.indexOf("=") + 1);
+                accessions = s.substring(s.indexOf("=") + 1);
             }
         }
-        throw new IOException("Parent Accessions not found in config");
+        parentAccessions.addAll(Arrays.asList(accessions.split(",")));
     }
 
     public List<String> parseWorkflowXML(String xmlPath) throws DocumentException {
@@ -199,7 +195,7 @@ public class WorkflowSpoofing {
 
     public static void main(String[] args) throws Exception {
         WorkflowSpoofing ws = new WorkflowSpoofing();
-       // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
+        // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
 //        BamQCDecider.main(bamParams);
         ws.run("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml");
     }
