@@ -15,11 +15,18 @@ import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
-import ca.on.oicr.pde.deciders.BamQCDecider;
-import java.io.FilenameFilter;
+import com.cloudera.net.iharder.base64.Base64;
+import java.io.StringWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import net.sourceforge.seqware.common.metadata.Metadata;
+import net.sourceforge.seqware.common.metadata.MetadataFactory;
+import net.sourceforge.seqware.common.util.configtools.ConfigTools;
+import org.apache.commons.io.IOUtils;
 
 public class WorkflowSpoofing {
 
@@ -27,6 +34,8 @@ public class WorkflowSpoofing {
     private final Set<String> parentAccessions = new HashSet<String>();
     private String mimeType;
     private String outputFile;
+    Map<String, String> hm = ConfigTools.getSettings();
+    Metadata metadata = MetadataFactory.get(hm);
 
     public void run(String xmlPath) throws Exception {
         //parses the ini to get all the parent accessions the workflow accesses
@@ -40,9 +49,16 @@ public class WorkflowSpoofing {
 
         //Gets all the provision File out scripts
         scripts.addAll(parseWorkflowXML(xmlPath));
-
+        
+        //Gets the file provenance report
+        String[] report = getFileProvenanceReport();
+        
+        for(String s : report){
+            System.out.println(s);
+            System.out.println("\n");
+        }
+        
         for (String script : scripts) {
-            System.out.println(script);
             FileUtils.writeStringToFile(fileLinkerFile, parseProvisionScript(script), true);
         }
 
@@ -66,6 +82,40 @@ public class WorkflowSpoofing {
 //            System.out.println(f.getCanonicalPath());
 //        }
     }
+    
+    private String[] getFileProvenanceReport() throws Exception {
+        String userAuth = Base64.encodeBytes("admin@admin.com:admin".getBytes());
+        String url = getWebserviceUrl();
+        
+        //Removes the last slash of the webservice url if it exists
+        if(url.endsWith("/")){
+            url = url.substring(0, url.lastIndexOf("/"));
+            System.out.println(url);
+        }
+        
+        //Refreshes file provenance report
+        URL refreshUrl = new URL(url+"/reports/file-provenance/generate");
+        HttpURLConnection connection2 = (HttpURLConnection) refreshUrl.openConnection();
+        connection2.setRequestMethod("GET");
+        connection2.setDoOutput(true);
+        connection2.setRequestProperty("Authorization", "Basic "+userAuth);
+        connection2.connect();
+        
+        //Gets the file provenance report
+        URL reportUrl = new URL(url+"/reports/file-provenance");
+        
+        HttpURLConnection connection = (HttpURLConnection) reportUrl.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Authorization", "Basic "+userAuth);
+        connection.connect();
+        
+        StringWriter reportWriter = new StringWriter();
+        IOUtils.copy(connection.getInputStream(), reportWriter);
+        
+        return reportWriter.toString().trim().split("\n");
+    }
+
 
     private String parseProvisionScript(String script) throws IOException {
         String fileLinkerString = "";
@@ -111,11 +161,6 @@ public class WorkflowSpoofing {
         }
         throw new Exception("Could not get webservice url");
     }
-
-    private String getParentAccession(String parameter) {
-        return parameter.substring(parameter.indexOf(" ") + 1, parameter.lastIndexOf(" "));
-    }
-
     private String getMimeType(String parameter) {
         return parameter.substring(parameter.indexOf("::") + 2, parameter.lastIndexOf("::"));
     }
@@ -204,5 +249,4 @@ public class WorkflowSpoofing {
 //        BamQCDecider.main(bamParams);
         ws.run("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml");
     }
-
 }
