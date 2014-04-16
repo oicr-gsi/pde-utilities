@@ -20,17 +20,21 @@ import java.io.FilenameFilter;
 import java.util.Arrays;
 
 public class WorkflowSpoofing {
-
-    public void run(String xmlPath) throws DocumentException, IOException {
+    
+    private final List<String> scripts = new ArrayList<String>();
+    public void run(String xmlPath) throws Exception {
         //Create the file linker file
         File fileLinkerFile = new File("fileLinkerFile");
         //Writes the file's header
         FileUtils.writeStringToFile(fileLinkerFile, "sequencer_run,sample,lane,ius_sw_accession,file_status,mime_type,file\n");
         //fileLinkerFile.deleteOnExit();
+        
 
-        List<String> scripts = parseWorkflowXML(xmlPath);
+        scripts.addAll(parseWorkflowXML(xmlPath));
+        System.out.println(getWebserviceUrl());
 
         for (String script : scripts) {
+            System.out.println(script);
             FileUtils.writeStringToFile(fileLinkerFile, parseProvisionScript(script), true);
         }
 
@@ -81,9 +85,30 @@ public class WorkflowSpoofing {
         for (int i = 0; i < parentAccessions.size(); i++) {
             fileLinkerString += ".,.,.,.,.," + mimeType + "," + outputFile + "\n";
         }
-        
+        System.out.println(fileLinkerString);
         return fileLinkerString;
 
+    }
+    
+    private String getWebserviceUrl() throws Exception{
+        String aScript = FileUtils.readFileToString(new File(scripts.get(0)));
+        String settingsPath="";
+        for(String scriptLines : aScript.split("\n")){
+            if(scriptLines.matches("export SEQWARE_SETTINGS=.*")){
+                settingsPath = scriptLines.substring(scriptLines.indexOf("=")+1);
+            }
+        }
+       if(settingsPath.isEmpty()){
+           throw new Exception("Settings file not found");
+       }
+       
+       String settings = FileUtils.readFileToString(new File(settingsPath));
+       for(String setting : settings.split("\n")){
+           if(setting.matches("SW_REST_URL=.*")){
+               return setting.substring(setting.indexOf("=")+1);
+           }
+       }
+       throw new Exception("Could not get webservice url");
     }
 
     private String getParentAccession(String parameter) {
@@ -117,7 +142,7 @@ public class WorkflowSpoofing {
                 return s.substring(s.indexOf("=") + 1);
             }
         }
-        return null;
+        throw new IOException("Parent Accessions not found in config");
     }
 
     public List<String> parseWorkflowXML(String xmlPath) throws DocumentException {
@@ -172,7 +197,7 @@ public class WorkflowSpoofing {
         return null;
     }
 
-    public static void main(String[] args) throws DocumentException, IOException {
+    public static void main(String[] args) throws Exception {
         WorkflowSpoofing ws = new WorkflowSpoofing();
        // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
 //        BamQCDecider.main(bamParams);
