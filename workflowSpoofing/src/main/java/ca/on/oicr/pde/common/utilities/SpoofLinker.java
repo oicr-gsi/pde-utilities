@@ -5,6 +5,8 @@
  */
 package ca.on.oicr.pde.common.utilities;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 /**
  *
  * @author Raunaq Suri
@@ -31,7 +33,6 @@ public class SpoofLinker {
      *
      * @return the sample name
      */
-
     public String getSampleName() {
         return sampleName;
     }
@@ -41,7 +42,6 @@ public class SpoofLinker {
      *
      * @return the run name
      */
-
     public String getRunName() {
         return runName;
     }
@@ -51,7 +51,6 @@ public class SpoofLinker {
      *
      * @return the lane number
      */
-
     public String getLane() {
         return lane;
     }
@@ -61,7 +60,6 @@ public class SpoofLinker {
      *
      * @return the file that's being linked
      */
-
     public String getFile() {
         return file;
     }
@@ -71,7 +69,6 @@ public class SpoofLinker {
      *
      * @return the mime type
      */
-
     public String getMimeType() {
         return mimeType;
     }
@@ -81,7 +78,6 @@ public class SpoofLinker {
      *
      * @return the linked file
      */
-
     public String getFileStatus() {
         return fileStatus;
     }
@@ -100,7 +96,6 @@ public class SpoofLinker {
      *
      * @param mime the mime-type of the file
      */
-
     public void setMimeType(String mime) {
         this.mimeType = mime;
     }
@@ -119,7 +114,6 @@ public class SpoofLinker {
      *
      * @param ius the swid you want to link to
      */
-
     public void setIus(String ius) {
         this.ius = ius;
     }
@@ -129,7 +123,6 @@ public class SpoofLinker {
      *
      * @param sample the sample name
      */
-
     public void setSampleName(String sample) {
         this.sampleName = sample;
     }
@@ -139,7 +132,6 @@ public class SpoofLinker {
      *
      * @param run the run name
      */
-
     public void setRunName(String run) {
         this.runName = run;
     }
@@ -149,7 +141,6 @@ public class SpoofLinker {
      *
      * @param laneNumber number of the lane you want to link to
      */
-
     public void setLane(String laneNumber) {
         this.lane = laneNumber;
 
@@ -180,6 +171,18 @@ public class SpoofLinker {
      */
     @Override
     public String toString() {
-        return "Hello World";
+        String line = runName + separator + sampleName + separator + lane + separator + ius + separator + fileStatus + separator + mimeType + separator + file;
+        return line;
+    }
+
+    public boolean equals(SpoofLinker other) {
+        EqualsBuilder equal = new EqualsBuilder();
+        equal.append(this.getSampleName(), other.getSampleName());
+        equal.append(this.getIus(), other.getIus());
+        equal.append(this.getLane(), other.getLane());
+        equal.append(this.file, other.getFile());
+        equal.append(this.mimeType, other.getMimeType());
+        
+        return equal.isEquals();
     }
 }
