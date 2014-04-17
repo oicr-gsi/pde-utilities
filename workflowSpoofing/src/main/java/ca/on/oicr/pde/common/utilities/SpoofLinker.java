@@ -6,6 +6,7 @@
 package ca.on.oicr.pde.common.utilities;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  *
@@ -171,23 +172,26 @@ public class SpoofLinker {
      */
     @Override
     public String toString() {
-        String line = runName + separator + sampleName + separator + lane + separator + ius + separator + fileStatus + separator + mimeType + separator + file +"\n";
+        String line = runName + separator + sampleName + separator + lane + separator + ius + separator + fileStatus + separator + mimeType + separator + file + "\n";
         return line;
     }
+
     /**
-     * Overloading equals() method
-     * @param other the other SpoofLinker obj to compare to
+     * Override
+     *
+     * @param obj the other SpoofLinker obj to compare to
      * @return whether they are equal or not
      */
-
-    public boolean equals(SpoofLinker other) {
-        EqualsBuilder equal = new EqualsBuilder();
-        equal.append(this.getSampleName(), other.getSampleName());
-        equal.append(this.getIus(), other.getIus());
-        equal.append(this.getLane(), other.getLane());
-        equal.append(this.file, other.getFile());
-        equal.append(this.mimeType, other.getMimeType());
+    @Override
+    public boolean equals(Object obj) {
         
-        return equal.isEquals();
+        return EqualsBuilder.reflectionEquals(this, obj);
+        
+        
+    }
+
+    @Override
+    public int hashCode() {
+         return HashCodeBuilder.reflectionHashCode(this);
     }
 }

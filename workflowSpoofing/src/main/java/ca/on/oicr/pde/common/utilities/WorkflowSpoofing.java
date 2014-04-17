@@ -43,7 +43,7 @@ public class WorkflowSpoofing {
         parseIniFile("/home/rsuri/workflow_cas_2.2_TS_withManualOutput.ini");
 
         //Create the file linker file
-        File fileLinkerFile = new File("fileLinkerFile");
+        File fileLinkerFile = new File("fileLinkerFile.csv");
         //Writes the file's header
         FileUtils.writeStringToFile(fileLinkerFile, "sequencer_run,sample,lane,ius_sw_accession,file_status,mime_type,file\n");
         //fileLinkerFile.deleteOnExit();
@@ -51,25 +51,20 @@ public class WorkflowSpoofing {
         //Gets all the provision File out scripts
         scripts.addAll(parseWorkflowXML(xmlPath));
 
-        String fileLinkerString = "";
+        //Casts the list into a set
 
         //Gets the file provenance report and stores it in file linker objects
-        List<SpoofLinker> fileLinkerObjs = FileProvenanceReaderForFileLinker.readWithCsvMapReader(getFileProvenanceReport());
-
+        Set<SpoofLinker> fileLinkerObjs = FileProvenanceReaderForFileLinker.readWithCsvMapReader(getFileProvenanceReport());
+        
         for (String script : scripts) {
             parseProvisionScript(script);
             for (SpoofLinker spoof : fileLinkerObjs) {
                 spoof.setFile(outputFile);
                 spoof.setMimeType(mimeType);
                 spoof.setSeparator(",");
+                FileUtils.writeStringToFile(fileLinkerFile, spoof.toString(), true);
             }
-        }
-        
-        //Casts the list into a set
-        Set<SpoofLinker> fileLinkerLines = new HashSet<SpoofLinker>(fileLinkerObjs);
-        
-        for(SpoofLinker line : fileLinkerLines){
-            FileUtils.writeStringToFile(fileLinkerFile, line.toString(), true);
+                 
         }
 
 //        List<File> iniFiles = new ArrayList<File>();
@@ -135,9 +130,8 @@ public class WorkflowSpoofing {
         connection.connect();
 
         StringWriter reportWriter = new StringWriter();
-        IOUtils.copy(connection.getInputStream(), reportWriter);
-
-        StringReader reader = new StringReader(reportWriter.toString());
+        IOUtils.copy(connection.getInputStream(), reportWriter);      
+        StringReader reader = new StringReader(reportWriter.toString().trim());
         return reader;
     }
 

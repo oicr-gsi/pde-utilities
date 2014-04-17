@@ -7,6 +7,7 @@ package ca.on.oicr.pde.common.utilities;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -128,10 +129,10 @@ class FileProvenanceReaderForFileLinker {
         return header;
     }
 
-    public static List<SpoofLinker> readWithCsvMapReader(StringReader reader) throws Exception {
+    public static Set<SpoofLinker> readWithCsvMapReader(StringReader reader) throws Exception {
 
         ICsvBeanReader beanReader = null;
-        List<SpoofLinker> fileLinkerObjects = new ArrayList<SpoofLinker>();
+        Set<SpoofLinker> fileLinkerObjects = new HashSet<SpoofLinker>();
 
         try {
             beanReader = new CsvBeanReader(reader, CsvPreference.TAB_PREFERENCE);
@@ -144,8 +145,8 @@ class FileProvenanceReaderForFileLinker {
 
             while ((fileLinker = beanReader.read(SpoofLinker.class, header, processors)) != null) {
                 fileLinkerObjects.add(fileLinker);
+                
             }
-            
             
 
         } finally {
