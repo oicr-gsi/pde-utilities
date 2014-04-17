@@ -43,6 +43,18 @@ public class SpoofLinker {
     public String getFileStatus() {
         return fileStatus;
     }
+    
+    public void setFile(String file){
+        this.file = file;
+    }
+    
+    public void setMimeType(String mime){
+        this.mimeType = mime;
+    }
+    
+    public void setFileStatus(String status){
+        this.fileStatus = status;
+    }
 
     public void setIus(String ius) {
         this.ius = ius;
