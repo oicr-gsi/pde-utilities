@@ -174,6 +174,11 @@ public class SpoofLinker {
         String line = runName + separator + sampleName + separator + lane + separator + ius + separator + fileStatus + separator + mimeType + separator + file;
         return line;
     }
+    /**
+     * Overloading equals() method
+     * @param other the other SpoofLinker obj to compare to
+     * @return whether they are equal or not
+     */
 
     public boolean equals(SpoofLinker other) {
         EqualsBuilder equal = new EqualsBuilder();
