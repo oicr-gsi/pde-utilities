@@ -12,6 +12,9 @@ package ca.on.oicr.pde.common.utilities;
 public class SpoofLinker {
 
     private String ius, lane, sampleName, runName;
+    private String file;
+    private String mimeType;
+    private String fileStatus;
 
     public String getIus() {
         return ius;
@@ -27,6 +30,18 @@ public class SpoofLinker {
 
     public String getLane() {
         return lane;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public String getFileStatus() {
+        return fileStatus;
     }
 
     public void setIus(String ius) {
@@ -48,6 +63,6 @@ public class SpoofLinker {
 
     @Override
     public String toString() {
-        return "Hello World"
+        return "Hello World";
     }
 }
