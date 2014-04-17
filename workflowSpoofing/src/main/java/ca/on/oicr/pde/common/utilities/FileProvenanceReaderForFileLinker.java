@@ -23,7 +23,7 @@ import org.supercsv.prefs.CsvPreference;
  *
  * @author Raunaq Suri
  */
-public class FileProvenanceReaderForFileLinker {
+class FileProvenanceReaderForFileLinker {
 
     private static CellProcessor[] getProcessors() {
         final CellProcessor[] processers = new CellProcessor[]{

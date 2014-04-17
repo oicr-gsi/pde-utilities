@@ -171,7 +171,7 @@ public class SpoofLinker {
      */
     @Override
     public String toString() {
-        String line = runName + separator + sampleName + separator + lane + separator + ius + separator + fileStatus + separator + mimeType + separator + file;
+        String line = runName + separator + sampleName + separator + lane + separator + ius + separator + fileStatus + separator + mimeType + separator + file +"\n";
         return line;
     }
     /**

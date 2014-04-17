@@ -16,6 +16,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import com.cloudera.net.iharder.base64.Base64;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -40,7 +41,7 @@ public class WorkflowSpoofing {
     public void run(String xmlPath) throws Exception {
         //parses the ini to get all the parent accessions the workflow accesses
         parseIniFile("/home/rsuri/workflow_cas_2.2_TS_withManualOutput.ini");
-        
+
         //Create the file linker file
         File fileLinkerFile = new File("fileLinkerFile");
         //Writes the file's header
@@ -49,17 +50,26 @@ public class WorkflowSpoofing {
 
         //Gets all the provision File out scripts
         scripts.addAll(parseWorkflowXML(xmlPath));
-        
-        //Gets the file provenance report
-        String[] report = getFileProvenanceReport();
-        
-        for(String s : report){
-            System.out.println(s);
-            System.out.println("\n");
+
+        String fileLinkerString = "";
+
+        //Gets the file provenance report and stores it in file linker objects
+        List<SpoofLinker> fileLinkerObjs = FileProvenanceReaderForFileLinker.readWithCsvMapReader(getFileProvenanceReport());
+
+        for (String script : scripts) {
+            parseProvisionScript(script);
+            for (SpoofLinker spoof : fileLinkerObjs) {
+                spoof.setFile(outputFile);
+                spoof.setMimeType(mimeType);
+                spoof.setSeparator(",");
+            }
         }
         
-        for (String script : scripts) {
-            FileUtils.writeStringToFile(fileLinkerFile, parseProvisionScript(script), true);
+        //Casts the list into a set
+        Set<SpoofLinker> fileLinkerLines = new HashSet<SpoofLinker>(fileLinkerObjs);
+        
+        for(SpoofLinker line : fileLinkerLines){
+            FileUtils.writeStringToFile(fileLinkerFile, line.toString(), true);
         }
 
 //        List<File> iniFiles = new ArrayList<File>();
@@ -82,57 +92,56 @@ public class WorkflowSpoofing {
 //            System.out.println(f.getCanonicalPath());
 //        }
     }
-    
-    private String[] getFileProvenanceReport() throws Exception {
+
+    private StringReader getFileProvenanceReport() throws Exception {
         String userAuth = Base64.encodeBytes("admin@admin.com:admin".getBytes());
         String url = getWebserviceUrl();
         String params = "?";
-        
+
         Iterator<String> processingIter = parentAccessions.iterator();
-        
+
         //First id
-        if(processingIter.hasNext()){
+        if (processingIter.hasNext()) {
             String id = processingIter.next();
-            params+="processing="+id;
+            params += "processing=" + id;
         }
         //The rest
-        while(processingIter.hasNext()){
+        while (processingIter.hasNext()) {
             String id = processingIter.next();
-            params+="&processing="+id;
+            params += "&processing=" + id;
         }
-        
+
         //Removes the last slash of the webservice url if it exists
-        if(url.endsWith("/")){
+        if (url.endsWith("/")) {
             url = url.substring(0, url.lastIndexOf("/"));
             System.out.println(url);
         }
-        
+
         //Refreshes file provenance report
-        URL refreshUrl = new URL(url+"/reports/file-provenance/generate");
+        URL refreshUrl = new URL(url + "/reports/file-provenance/generate");
         HttpURLConnection connection2 = (HttpURLConnection) refreshUrl.openConnection();
         connection2.setRequestMethod("GET");
         connection2.setDoOutput(true);
-        connection2.setRequestProperty("Authorization", "Basic "+userAuth);
+        connection2.setRequestProperty("Authorization", "Basic " + userAuth);
         connection2.connect();
-        
+
         //Gets the file provenance report
-        URL reportUrl = new URL(url+"/reports/file-provenance"+params);
-        
+        URL reportUrl = new URL(url + "/reports/file-provenance" + params);
+
         HttpURLConnection connection = (HttpURLConnection) reportUrl.openConnection();
         connection.setRequestMethod("GET");
         connection.setDoOutput(true);
-        connection.setRequestProperty("Authorization", "Basic "+userAuth);
+        connection.setRequestProperty("Authorization", "Basic " + userAuth);
         connection.connect();
-        
+
         StringWriter reportWriter = new StringWriter();
         IOUtils.copy(connection.getInputStream(), reportWriter);
-        
-        return reportWriter.toString().trim().split("\n");
+
+        StringReader reader = new StringReader(reportWriter.toString());
+        return reader;
     }
 
-
-    private String parseProvisionScript(String script) throws IOException {
-        String fileLinkerString = "";
+    private void parseProvisionScript(String script) throws IOException {
 
         File scriptFile = new File(script);
 
@@ -147,12 +156,6 @@ public class WorkflowSpoofing {
 
             }
         }
-
-        for (int i = 0; i < parentAccessions.size(); i++) {
-            fileLinkerString += ".,.,.,.,.," + mimeType + "," + outputFile + "\n";
-        }
-        System.out.println(fileLinkerString);
-        return fileLinkerString;
     }
 
     private String getWebserviceUrl() throws Exception {
@@ -175,6 +178,7 @@ public class WorkflowSpoofing {
         }
         throw new Exception("Could not get webservice url");
     }
+
     private String getMimeType(String parameter) {
         return parameter.substring(parameter.indexOf("::") + 2, parameter.lastIndexOf("::"));
     }
