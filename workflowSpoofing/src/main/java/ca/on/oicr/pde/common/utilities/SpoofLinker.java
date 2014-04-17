@@ -11,68 +11,173 @@ package ca.on.oicr.pde.common.utilities;
  */
 public class SpoofLinker {
 
-    private String ius, lane, sampleName, runName;
-    private String file;
-    private String mimeType;
-    private String fileStatus;
+    private String ius = null, lane = ".", sampleName = ".", runName = ".";
+    private String file = null;
+    private String mimeType = ".";
+    private String fileStatus = ".";
+    private String separator = ",";
 
+    /**
+     * Gets the IUS SW Accession
+     *
+     * @return the accession
+     */
     public String getIus() {
         return ius;
     }
+
+    /**
+     * gets the sample name
+     *
+     * @return the sample name
+     */
 
     public String getSampleName() {
         return sampleName;
     }
 
+    /**
+     * gets the run name
+     *
+     * @return the run name
+     */
+
     public String getRunName() {
         return runName;
     }
+
+    /**
+     * gets the lane number
+     *
+     * @return the lane number
+     */
 
     public String getLane() {
         return lane;
     }
 
+    /**
+     * gets the file being linked
+     *
+     * @return the file that's being linked
+     */
+
     public String getFile() {
         return file;
     }
+
+    /**
+     * gets the mime type of the file
+     *
+     * @return the mime type
+     */
 
     public String getMimeType() {
         return mimeType;
     }
 
+    /**
+     * gets the file status of the file to be linked
+     *
+     * @return the linked file
+     */
+
     public String getFileStatus() {
         return fileStatus;
     }
-    
-    public void setFile(String file){
+
+    /**
+     * sets the file
+     *
+     * @param file The path of the file
+     */
+    public void setFile(String file) {
         this.file = file;
     }
-    
-    public void setMimeType(String mime){
+
+    /**
+     * Sets the mime type of the file
+     *
+     * @param mime the mime-type of the file
+     */
+
+    public void setMimeType(String mime) {
         this.mimeType = mime;
     }
-    
-    public void setFileStatus(String status){
+
+    /**
+     * Sets the file status of the file
+     *
+     * @param status the status of the file
+     */
+    public void setFileStatus(String status) {
         this.fileStatus = status;
     }
+
+    /**
+     * Sets the ius swid
+     *
+     * @param ius the swid you want to link to
+     */
 
     public void setIus(String ius) {
         this.ius = ius;
     }
 
+    /**
+     * Sets the sample name you want to link to
+     *
+     * @param sample the sample name
+     */
+
     public void setSampleName(String sample) {
         this.sampleName = sample;
     }
+
+    /**
+     * Sets the run name you want to link to
+     *
+     * @param run the run name
+     */
 
     public void setRunName(String run) {
         this.runName = run;
     }
 
-    public void setLane(String laneName) {
-        this.lane = laneName;
+    /**
+     * Sets the lane you wish to link to
+     *
+     * @param laneNumber number of the lane you want to link to
+     */
+
+    public void setLane(String laneNumber) {
+        this.lane = laneNumber;
 
     }
 
+    /**
+     * Sets the way to separate the files
+     *
+     * @param separator the separator, usually "\t" or ","
+     */
+    public void setSeparator(String separator) {
+        this.separator = separator;
+    }
+
+    /**
+     * Gets the separator used
+     *
+     * @return separator
+     */
+    public String getSeparator() {
+        return separator;
+    }
+
+    /**
+     * To String
+     *
+     * @return the way it should appear in accordance to the file Linker format
+     */
     @Override
     public String toString() {
         return "Hello World";
