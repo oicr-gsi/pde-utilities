@@ -40,7 +40,9 @@ public class WorkflowSpoofing {
     Map<String, String> hm = ConfigTools.getSettings();
     Metadata metadata = MetadataFactory.get(hm);
 
-    public void run(String xmlPath, int workflowRunID) throws Exception {
+    public void spoof(String xmlPath, int workflowRunID) throws Exception {
+        
+        int wfAccession = metadata.getWorkflowRun(workflowRunID).getWorkflowAccession();
         //parses the ini to get all the parent accessions the workflow accesses
         parseIniFile(metadata.getWorkflowRun(workflowRunID).getIniFile());
 
@@ -48,7 +50,7 @@ public class WorkflowSpoofing {
         File fileLinkerFile = new File("fileLinkerFile.csv");
         //Writes the file's header
         FileUtils.writeStringToFile(fileLinkerFile, "sequencer_run,sample,lane,ius_sw_accession,file_status,mime_type,file\n");
-        //fileLinkerFile.deleteOnExit();
+        fileLinkerFile.deleteOnExit();
 
         //Gets all the provision File out scripts
         scripts.addAll(parseWorkflowXML(xmlPath));
@@ -271,6 +273,6 @@ public class WorkflowSpoofing {
         WorkflowSpoofing ws = new WorkflowSpoofing();
         // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
 //        BamQCDecider.main(bamParams);
-        ws.run("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml", 192);
+        ws.spoof("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml", 929);
     }
 }
