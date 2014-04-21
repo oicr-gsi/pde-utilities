@@ -39,9 +39,15 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>ca.on.oicr.pde.deciders</groupId>
-            <artifactId>BamQC</artifactId>
-            <version>2.2</version>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.6</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.github.seqware</groupId>
+            <artifactId>seqware-distribution</artifactId>
+            <version>1.0.14-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
     </dependencies>
