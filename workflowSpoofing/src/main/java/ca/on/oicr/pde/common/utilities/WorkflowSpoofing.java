@@ -40,9 +40,9 @@ public class WorkflowSpoofing {
     Map<String, String> hm = ConfigTools.getSettings();
     Metadata metadata = MetadataFactory.get(hm);
 
-    public void run(String xmlPath) throws Exception {
+    public void run(String xmlPath, int workflowRunID) throws Exception {
         //parses the ini to get all the parent accessions the workflow accesses
-        parseIniFile("/home/rsuri/workflow_cas_2.2_TS_withManualOutput.ini");
+        parseIniFile(metadata.getWorkflowRun(workflowRunID).getIniFile());
 
         //Create the file linker file
         File fileLinkerFile = new File("fileLinkerFile.csv");
@@ -204,14 +204,11 @@ public class WorkflowSpoofing {
         return contents.split("--");
     }
 
-    public void parseIniFile(String iniFilePath) throws IOException {
-        File iniFile = new File(iniFilePath);
-        String iniToString = FileUtils.readFileToString(iniFile);
+    public void parseIniFile(String iniFile) throws IOException {
         //Splits the file by newlines
         String accessions = "";
-        for (String s : iniToString.split("\n")) {
+        for (String s : iniFile.split("\n")) {
             if (s.matches("^parent[-_]accession[s]*.*$")) {
-                System.out.println(s.substring(s.indexOf("=") + 1));
                 accessions = s.substring(s.indexOf("=") + 1);
             }
         }
@@ -274,6 +271,6 @@ public class WorkflowSpoofing {
         WorkflowSpoofing ws = new WorkflowSpoofing();
         // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
 //        BamQCDecider.main(bamParams);
-        ws.run("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml");
+        ws.run("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml", 192);
     }
 }
