@@ -92,7 +92,7 @@ public class WorkflowSpoofing {
         }
 
         //runs the file linker plugin
-        //runFileLinkerPlugin(fileLinkerFile.getCanonicalPath(), String.valueOf(wfAccession));
+        runFileLinkerPlugin(fileLinkerFile.getCanonicalPath(), String.valueOf(wfAccession));
     }
     
     private void runFileLinkerPlugin(String fileLinkerPath, String wfaccession) throws IOException {
