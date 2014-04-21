@@ -28,6 +28,7 @@ import net.sourceforge.seqware.common.metadata.Metadata;
 import net.sourceforge.seqware.common.metadata.MetadataFactory;
 import net.sourceforge.seqware.common.util.configtools.ConfigTools;
 import net.sourceforge.seqware.pipeline.plugins.FileLinker;
+import net.sourceforge.seqware.pipeline.plugins.WorkflowLauncher;
 import net.sourceforge.seqware.pipeline.runner.PluginRunner;
 import org.apache.commons.io.IOUtils;
 
@@ -37,13 +38,20 @@ public class WorkflowSpoofing {
     private final Set<String> parentAccessions = new HashSet<String>();
     private String mimeType;
     private String outputFile;
-    private Map<String, String> hm = ConfigTools.getSettings();
-    private Metadata metadata = MetadataFactory.get(hm);
+    private final Map<String, String> hm = ConfigTools.getSettings();
+    private final Metadata metadata = MetadataFactory.get(hm);
 
     public void spoof(String xmlPath, int workflowRunID) throws Exception {
 
         int wfAccession = metadata.getWorkflowRun(workflowRunID).getWorkflowAccession();
-
+        String bundle = metadata.getWorkflow(wfAccession).getCwd();
+        
+        File iniFile = new File("tempIniFile");
+        FileUtils.writeStringToFile( iniFile ,metadata.getWorkflowRun(workflowRunID).getIniFile());
+        iniFile.deleteOnExit();
+        
+        dryRun(wfAccession, iniFile.getCanonicalPath());
+        
         //parses the ini to get all the parent accessions the workflow accesses
         parseIniFile(metadata.getWorkflowRun(workflowRunID).getIniFile());
 
@@ -72,7 +80,7 @@ public class WorkflowSpoofing {
         }
 
         //runs the file linker plugin
-        runFileLinkerPlugin(fileLinkerFile.getCanonicalPath(), String.valueOf(wfAccession));
+        //runFileLinkerPlugin(fileLinkerFile.getCanonicalPath(), String.valueOf(wfAccession));
     }
 
     private void runFileLinkerPlugin(String fileLinkerPath, String wfaccession) throws IOException {
@@ -258,5 +266,19 @@ public class WorkflowSpoofing {
         // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
 //        BamQCDecider.main(bamParams);
         ws.spoof("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml", 929);
+    }
+
+    private void dryRun(int workflowAccession, String iniFilePath) {
+        String[] fileLinkerParams = {"--workflow-accession", String.valueOf(workflowAccession),
+            "--ini-files", iniFilePath, "--no-metadata", "--no-run"};
+        PluginRunner p = new PluginRunner();
+        List<String> a = new ArrayList<String>();
+        a.add("--plugin");
+        a.add(WorkflowLauncher.class.getCanonicalName());
+        a.add("--");
+        a.addAll(Arrays.asList(fileLinkerParams));
+        System.out.println(Arrays.deepToString(a.toArray()));
+
+        p.run(a.toArray(new String[a.size()]));
     }
 }
