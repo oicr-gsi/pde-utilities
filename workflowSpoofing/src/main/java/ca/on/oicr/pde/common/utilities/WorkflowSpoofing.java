@@ -27,6 +27,8 @@ import java.util.Set;
 import net.sourceforge.seqware.common.metadata.Metadata;
 import net.sourceforge.seqware.common.metadata.MetadataFactory;
 import net.sourceforge.seqware.common.util.configtools.ConfigTools;
+import net.sourceforge.seqware.pipeline.plugins.FileLinker;
+import net.sourceforge.seqware.pipeline.runner.PluginRunner;
 import org.apache.commons.io.IOUtils;
 
 public class WorkflowSpoofing {
@@ -86,6 +88,20 @@ public class WorkflowSpoofing {
 //            parseIniFile(f.getCanonicalPath());
 //            System.out.println(f.getCanonicalPath());
 //        }
+    }
+    
+    private void runFileLinkerPlugin(String fileLinkerPath, String wfaccession) throws IOException {
+
+        String[] fileLinkerParams = {"--file-list-file", fileLinkerPath, "--workflow-accession", wfaccession, "--csv-separator", ","};
+        PluginRunner p = new PluginRunner();
+        List<String> a = new ArrayList<String>();
+        a.add("--plugin");
+        a.add(FileLinker.class.getCanonicalName());
+        a.add("--");
+        a.addAll(Arrays.asList(fileLinkerParams));
+        System.out.println(Arrays.deepToString(a.toArray()));
+
+        p.run(a.toArray(new String[a.size()]));
     }
 
     private StringReader getFileProvenanceReport() throws Exception {
