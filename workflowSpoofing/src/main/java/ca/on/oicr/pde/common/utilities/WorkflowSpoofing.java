@@ -37,12 +37,13 @@ public class WorkflowSpoofing {
     private final Set<String> parentAccessions = new HashSet<String>();
     private String mimeType;
     private String outputFile;
-    Map<String, String> hm = ConfigTools.getSettings();
-    Metadata metadata = MetadataFactory.get(hm);
+    private Map<String, String> hm = ConfigTools.getSettings();
+    private Metadata metadata = MetadataFactory.get(hm);
 
     public void spoof(String xmlPath, int workflowRunID) throws Exception {
-        
+
         int wfAccession = metadata.getWorkflowRun(workflowRunID).getWorkflowAccession();
+
         //parses the ini to get all the parent accessions the workflow accesses
         parseIniFile(metadata.getWorkflowRun(workflowRunID).getIniFile());
 
@@ -56,7 +57,7 @@ public class WorkflowSpoofing {
         scripts.addAll(parseWorkflowXML(xmlPath));
 
         //Casts the list into a set
-        //Gets the file provenance report and stores it in file linker objects
+        //Gets the file provenance report and stores it in file linker objects and write it to the file linker file
         Set<SpoofLinker> fileLinkerObjs = FileProvenanceReaderForFileLinker.readWithCsvMapReader(getFileProvenanceReport());
 
         for (String script : scripts) {
@@ -70,25 +71,8 @@ public class WorkflowSpoofing {
 
         }
 
-//        List<File> iniFiles = new ArrayList<File>();
-        //Testing the parsing of the ini files
-//        File iniRoot = new File("/tmp");
-//
-//        FilenameFilter filefilter = new FilenameFilter() {
-//
-//            public boolean accept(File dir, String name) {
-//                if (name.matches(".*.ini")) {
-//                    return true;
-//                }
-//                return false;
-//            }
-//        };
-//        iniFiles.addAll(Arrays.asList(iniRoot.listFiles(filefilter)));
-//
-//        for (File f : iniFiles) {
-//            parseIniFile(f.getCanonicalPath());
-//            System.out.println(f.getCanonicalPath());
-//        }
+        //runs the file linker plugin
+        runFileLinkerPlugin(fileLinkerFile.getCanonicalPath(), String.valueOf(wfAccession));
     }
 
     private void runFileLinkerPlugin(String fileLinkerPath, String wfaccession) throws IOException {
