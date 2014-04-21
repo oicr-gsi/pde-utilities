@@ -16,6 +16,8 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import com.cloudera.net.iharder.base64.Base64;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -41,7 +43,7 @@ public class WorkflowSpoofing {
     private final Map<String, String> hm = ConfigTools.getSettings();
     private final Metadata metadata = MetadataFactory.get(hm);
 
-    public void spoof(String xmlPath, int workflowRunID) throws Exception {
+    public void spoof(int workflowRunID) throws Exception {
 
         int wfAccession = metadata.getWorkflowRun(workflowRunID).getWorkflowAccession();
         String bundle = metadata.getWorkflow(wfAccession).getCwd();
@@ -50,8 +52,13 @@ public class WorkflowSpoofing {
         FileUtils.writeStringToFile( iniFile ,metadata.getWorkflowRun(workflowRunID).getIniFile());
         iniFile.deleteOnExit();
         
+        PrintStream old = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(baos));
         dryRun(wfAccession, iniFile.getCanonicalPath());
         
+        String dryRunOut = baos.toString();
+        String oozieDir = getOozieDir(dryRunOut);
         //parses the ini to get all the parent accessions the workflow accesses
         parseIniFile(metadata.getWorkflowRun(workflowRunID).getIniFile());
 
@@ -62,7 +69,7 @@ public class WorkflowSpoofing {
         fileLinkerFile.deleteOnExit();
 
         //Gets all the provision File out scripts
-        scripts.addAll(parseWorkflowXML(xmlPath));
+        scripts.addAll(parseWorkflowXML(oozieDir+"/workflow.xml"));
 
         //Casts the list into a set
         //Gets the file provenance report and stores it in file linker objects and write it to the file linker file
@@ -265,7 +272,7 @@ public class WorkflowSpoofing {
         WorkflowSpoofing ws = new WorkflowSpoofing();
         // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
 //        BamQCDecider.main(bamParams);
-        ws.spoof("/home/rsuri/working/oozie-f0346d6f-04ff-42da-9782-548139e78361/workflow.xml", 929);
+        ws.spoof(929);
     }
 
     private void dryRun(int workflowAccession, String iniFilePath) {
@@ -280,5 +287,15 @@ public class WorkflowSpoofing {
         System.out.println(Arrays.deepToString(a.toArray()));
 
         p.run(a.toArray(new String[a.size()]));
+    }
+
+    private String getOozieDir(String dryRunOut) throws Exception {
+        for(String s : dryRunOut.split("\n")){
+            if(s.matches("^Using working directory:.*$")){
+                String[] t = s.split(": ");
+                return t[1];
+            }
+        }
+        throw new Exception("Ooozie Dir not found");
     }
 }
