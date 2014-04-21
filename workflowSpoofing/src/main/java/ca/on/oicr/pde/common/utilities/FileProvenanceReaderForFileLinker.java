@@ -6,18 +6,12 @@
 package ca.on.oicr.pde.common.utilities;
 
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import org.supercsv.cellprocessor.Optional;
 import org.supercsv.cellprocessor.constraint.NotNull;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanReader;
-import org.supercsv.io.CsvMapReader;
 import org.supercsv.io.ICsvBeanReader;
-import org.supercsv.io.ICsvMapReader;
 import org.supercsv.prefs.CsvPreference;
 
 /**

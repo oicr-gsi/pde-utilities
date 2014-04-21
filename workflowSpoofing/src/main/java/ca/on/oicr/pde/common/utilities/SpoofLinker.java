@@ -184,14 +184,13 @@ public class SpoofLinker {
      */
     @Override
     public boolean equals(Object obj) {
-        
+
         return EqualsBuilder.reflectionEquals(this, obj);
-        
-        
+
     }
 
     @Override
     public int hashCode() {
-         return HashCodeBuilder.reflectionHashCode(this);
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 }

@@ -54,10 +54,9 @@ public class WorkflowSpoofing {
         scripts.addAll(parseWorkflowXML(xmlPath));
 
         //Casts the list into a set
-
         //Gets the file provenance report and stores it in file linker objects
         Set<SpoofLinker> fileLinkerObjs = FileProvenanceReaderForFileLinker.readWithCsvMapReader(getFileProvenanceReport());
-        
+
         for (String script : scripts) {
             parseProvisionScript(script);
             for (SpoofLinker spoof : fileLinkerObjs) {
@@ -66,7 +65,7 @@ public class WorkflowSpoofing {
                 spoof.setSeparator(",");
                 FileUtils.writeStringToFile(fileLinkerFile, spoof.toString(), true);
             }
-                 
+
         }
 
 //        List<File> iniFiles = new ArrayList<File>();
@@ -89,7 +88,7 @@ public class WorkflowSpoofing {
 //            System.out.println(f.getCanonicalPath());
 //        }
     }
-    
+
     private void runFileLinkerPlugin(String fileLinkerPath, String wfaccession) throws IOException {
 
         String[] fileLinkerParams = {"--file-list-file", fileLinkerPath, "--workflow-accession", wfaccession, "--csv-separator", ","};
@@ -146,7 +145,7 @@ public class WorkflowSpoofing {
         connection.connect();
 
         StringWriter reportWriter = new StringWriter();
-        IOUtils.copy(connection.getInputStream(), reportWriter);      
+        IOUtils.copy(connection.getInputStream(), reportWriter);
         StringReader reader = new StringReader(reportWriter.toString().trim());
         return reader;
     }
