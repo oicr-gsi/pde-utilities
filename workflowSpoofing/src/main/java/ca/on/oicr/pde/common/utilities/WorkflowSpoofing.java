@@ -62,7 +62,7 @@ public class WorkflowSpoofing {
         //Gets the oozie working directory
         String dryRunOut = baos.toString();
         String oozieDir = getOozieDir(dryRunOut);
-        
+       System.out.println("Oozie working dir: " + oozieDir); 
         //parses the ini to get all the parent accessions the workflow accesses
         parseIniFile(metadata.getWorkflowRun(workflowRunID).getIniFile());
 
@@ -120,11 +120,13 @@ public class WorkflowSpoofing {
         if (processingIter.hasNext()) {
             String id = processingIter.next();
             params += "processing=" + id;
+            System.out.println(params);
         }
         //The rest
         while (processingIter.hasNext()) {
             String id = processingIter.next();
             params += "&processing=" + id;
+            System.out.println(params);
         }
 
         //Removes the last slash of the webservice url if it exists
@@ -216,6 +218,7 @@ public class WorkflowSpoofing {
         for (String s : iniFile.split("\n")) {
             if (s.matches("^parent[-_]accession[s]*.*$")) {
                 accessions = s.substring(s.indexOf("=") + 1);
+                System.out.println("Parent Accessions" + accessions);
             }
         }
         parentAccessions.addAll(Arrays.asList(accessions.split(",")));
@@ -277,7 +280,7 @@ public class WorkflowSpoofing {
         WorkflowSpoofing ws = new WorkflowSpoofing();
         // String[] bamParams = {"--wf-accession", "928", "--study-name", "PDE_TEST", "--schedule"};
 //        BamQCDecider.main(bamParams);
-        ws.spoof(929);
+        ws.spoof(943);
     }
     
     private void dryRun(int workflowAccession, String iniFilePath) {
