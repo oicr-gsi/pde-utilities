@@ -26,8 +26,8 @@ class FileProvenanceReaderForFileLinker {
             null,
             null,
             null,
-	    null,
-	    null,
+            null,
+            null,
             null,
             null,
             null,
@@ -80,7 +80,7 @@ class FileProvenanceReaderForFileLinker {
             null,
             null,
             null,
-	    null,
+            null,
             null,
             null,
             null,
@@ -127,6 +127,14 @@ class FileProvenanceReaderForFileLinker {
         return header;
     }
 
+    /**
+     * Reads the file-provenance tsv
+     *
+     * @param reader the tsv as a stringreader
+     * @return a list of spooflinker objects with all the data values already
+     * defined
+     * @throws Exception
+     */
     public static Set<SpoofLinker> readWithCsvMapReader(StringReader reader) throws Exception {
 
         ICsvBeanReader beanReader = null;
@@ -143,9 +151,8 @@ class FileProvenanceReaderForFileLinker {
 
             while ((fileLinker = beanReader.read(SpoofLinker.class, header, processors)) != null) {
                 fileLinkerObjects.add(fileLinker);
-                
+
             }
-            
 
         } finally {
             if (beanReader != null) {

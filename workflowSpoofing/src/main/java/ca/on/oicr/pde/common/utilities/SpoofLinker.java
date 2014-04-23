@@ -9,6 +9,7 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
+ * A class you can use to write file linker files
  *
  * @author Raunaq Suri
  */
