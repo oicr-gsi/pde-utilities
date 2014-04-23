@@ -319,15 +319,17 @@ public class WorkflowSpoofing {
     }
 
     private String getOutputScriptFilePaths(Element action) {
-        for (Iterator i = action.elementIterator("sge"); i.hasNext();) {
+        Iterator i = action.elementIterator("sge");
+        if (i.hasNext()) {
             Element sge = (Element) i.next();
-            for (Iterator j = sge.elementIterator("script"); j.hasNext();) {
+            Iterator j = sge.elementIterator("script");
+            if (j.hasNext()) {
                 Element scriptPath = (Element) j.next();
                 String path = scriptPath.getData().toString();
                 return path;
             }
-
         }
+
         return null;
     }
 
