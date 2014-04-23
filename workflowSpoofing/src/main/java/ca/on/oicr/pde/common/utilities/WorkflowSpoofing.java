@@ -260,7 +260,7 @@ public class WorkflowSpoofing {
      * @param iniFile the ini file as a string
      * @throws IOException
      */
-    public void parseIniFile(String iniFile) throws IOException {
+    private void parseIniFile(String iniFile) throws IOException {
         //Splits the file by newlines
         String accessions = "";
         for (String s : iniFile.split("\n")) {
