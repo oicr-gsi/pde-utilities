@@ -1,0 +1,24 @@
+Context for this information can be found in the ticket PDE-510.
+To use these files: edit submit.sh to qsub the appropriate scripts. 
+
+======
+
+Naive implementation of comparisons: 
+
+"I can use BamDiff to diff two BAM files aligned from the same FASTQ and produce an output text file. Since the number of differences between two files has a direct correlation to the number of lines in the output of a diff, I can use the size of the file output by the diff command as a measure of deviation between the two files. Therefore, if I have a large number of diffed output files, I can collect data on the sizes of those files, with a mean and standard deviation. "
+
+>> This implementation is found in the file sample_cpcg.sh
+
+======
+
+Better implementation of comparisons:
+
+1. use BWA
+2. keep a reference BAM (say the first one) and then keep the diffs of every BAM subsequently. You could use the diff to re-create each BAM in memory and use that to compare to the incoming BAM files. That way we could immediately delete the large files and just keep the smallish diffs.  
+
+>> An attempted implementation of this is found in sample_pop6.sh
+>> It still uses novoalign instead of BWA
+>> It does not work right now because BamDiff does not play nice with the unix utility Patch. 
+>> Next steps: Helpdesk successfully installed BsDiff and BsPatch onto the cluster. They should work with the bam files directly.
+
+====== 
