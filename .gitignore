@@ -4,3 +4,6 @@
 *.jar
 *.war
 *.ear
+/workflowSpoofing/target/
+nbactions.xml
+/workflowSpoofing/*.csv
