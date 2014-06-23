@@ -83,19 +83,21 @@ while (<FILE>) {
 
 	#create the hierarchy for this sample
 	make_path $dir;
-	#lazy way of creating an about file in each directory with the full contents of this line of the CSV file
-	`echo "@line">>$dir/about`;
+
 	#Symlink the fastqs
 	foreach my $fastq(@fastqs) {
 		my $base = basename($fastq);
 		symlink $fastq, "$dir/$base";
+		push(@line,$fastq);
 	}
 	#Symlink the BAMs
 	foreach my $bam(@bams) {
 		my $base = basename($bam);
 		symlink $bam, "$dir/$base";
+		push(@line,$bam);
 	}
-
+	#lazy way of creating an about file in each directory with the full contents of this line of the CSV file plus the files
+	`echo "@line">>$dir/about`;
 }
 
 close FILE;
