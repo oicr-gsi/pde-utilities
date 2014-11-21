@@ -1,0 +1,19 @@
+#ftp://gsapubftp-anonymous@ftp.broadinstitute.org
+bundle/2.5/hg19/1000G_omni2.5.hg19.vcf.gz	bundle/2.5/hg19/1000G_omni2.5.hg19.vcf.gz.md5
+bundle/2.5/hg19/1000G_omni2.5.hg19.vcf.idx.gz	bundle/2.5/hg19/1000G_omni2.5.hg19.vcf.idx.gz.md5
+bundle/2.5/hg19/1000G_phase1.indels.hg19.vcf.gz	bundle/2.5/hg19/1000G_phase1.indels.hg19.vcf.gz.md5
+bundle/2.5/hg19/dbsnp_137.hg19.vcf.gz	bundle/2.5/hg19/dbsnp_137.hg19.vcf.gz.md5
+bundle/2.5/hg19/dbsnp_137.hg19.vcf.idx.gz	bundle/2.5/hg19/dbsnp_137.hg19.vcf.idx.gz.md5
+bundle/2.5/hg19/hapmap_3.3.hg19.vcf.gz	bundle/2.5/hg19/hapmap_3.3.hg19.vcf.gz.md5
+bundle/2.5/hg19/hapmap_3.3.hg19.vcf.idx.gz	bundle/2.5/hg19/hapmap_3.3.hg19.vcf.idx.gz.md5
+bundle/2.5/hg19/ucsc.hg19.fasta.gz	bundle/2.5/hg19/ucsc.hg19.fasta.gz.md5
+bundle/2.5/hg19/ucsc.hg19.dict.gz	bundle/2.5/hg19/ucsc.hg19.dict.gz.md5
+bundle/2.5/hg19/ucsc.hg19.fasta.fai.gz	bundle/2.5/hg19/ucsc.hg19.fasta.fai.gz.md5
+bundle/2.5/hg19/1000G_phase1.indels.hg19.vcf.gz	bundle/2.5/hg19/1000G_phase1.indels.hg19.vcf.gz.md5
+bundle/2.5/hg19/1000G_phase1.indels.hg19.vcf.idx.gz	bundle/2.5/hg19/1000G_phase1.indels.hg19.vcf.idx.gz.md5
+bundle/2.5/hg19/1000G_phase1.snps.high_confidence.hg19.vcf.gz	bundle/2.5/hg19/1000G_phase1.snps.high_confidence.hg19.vcf.gz.md5
+bundle/2.5/hg19/1000G_phase1.snps.high_confidence.hg19.vcf.idx.gz	bundle/2.5/hg19/1000G_phase1.snps.high_confidence.hg19.vcf.idx.gz.md5
+#ftp://ftp-trace.ncbi.nih.gov/1000genomes/ftp
+data/NA19240/alignment/NA19240.chrom20.ILLUMINA.bwa.YRI.low_coverage.20130415.bam	d5e0941467cb9780ffe4753f304d6245
+data/NA19239/alignment/NA19239.chrom20.ILLUMINA.bwa.YRI.low_coverage.20130415.bam	85a2de5000fa5596089aa860a02df933
+data/NA19238/alignment/NA19238.chrom20.ILLUMINA.bwa.YRI.low_coverage.20130415.bam	a4c752689a4385fd0c296439409df9ab
